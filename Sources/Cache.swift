@@ -14,12 +14,12 @@ import Foundation
 /// The implementation must be thread safe.
 public protocol Caching: class {
     /// Accesses the image associated with the given key.
-    subscript(key: AnyHashable) -> Image? { get set }
+    subscript(key: AnyHashable) -> NukeImage? { get set }
 }
 
 public extension Caching {
     /// Accesses the image associated with the given request.
-    public subscript(request: Request) -> Image? {
+    public subscript(request: Request) -> NukeImage? {
         get { return self[Request.cacheKey(for: request)] }
         set { self[Request.cacheKey(for: request)] = newValue }
     }
@@ -74,7 +74,7 @@ public final class Cache: Caching {
     }
 
     /// Accesses the image associated with the given key.
-    public subscript(key: AnyHashable) -> Image? {
+    public subscript(key: AnyHashable) -> NukeImage? {
         get {
             lock.lock()  // faster than `sync()`
             defer { lock.unlock() }
@@ -168,7 +168,7 @@ public final class Cache: Caching {
     }
 
     /// Returns cost for the given image by approximating its bitmap size in bytes in memory.
-    public var cost: (Image) -> Int = {
+    public var cost: (NukeImage) -> Int = {
         #if os(macOS)
             return 1
         #else
@@ -179,7 +179,7 @@ public final class Cache: Caching {
 }
 
 private struct CachedImage {
-    var image: Image
+    var image: NukeImage
     var cost: Int
     var key: AnyHashable
 }

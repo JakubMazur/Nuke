@@ -15,7 +15,7 @@
 /// Decodes image data.
 public protocol DataDecoding {
     /// Decodes image data.
-    func decode(data: Data, response: URLResponse) -> Image?
+    func decode(data: Data, response: URLResponse) -> NukeImage?
 }
 
 private let queue = DispatchQueue(label: "com.github.kean.Nuke.DataDecoder")
@@ -26,7 +26,7 @@ public struct DataDecoder: DataDecoding {
     public init() {}
 
     /// Creates an image with the given data.
-    public func decode(data: Data, response: URLResponse) -> Image? {
+    public func decode(data: Data, response: URLResponse) -> NukeImage? {
         guard DataDecoder.validate(response: response) else { return nil }
 
         // Image initializers are documented as fully-thread safe:
@@ -72,7 +72,7 @@ public final class DataDecoderComposition: DataDecoding {
 
     /// Decoders are applied in order in which they are present in the decoders
     /// array. The decoding stops when one of the decoders produces an image.
-    public func decode(data: Data, response: URLResponse) -> Image? {
+    public func decode(data: Data, response: URLResponse) -> NukeImage? {
         for decoder in decoders {
             if let image = decoder.decode(data: data, response: response) {
                 return image

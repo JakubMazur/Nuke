@@ -39,7 +39,7 @@ public final class Manager: Loading {
         }
     }
 
-    public typealias Handler = (Result<Image>, _ isFromMemoryCache: Bool) -> Void
+    public typealias Handler = (Result<NukeImage>, _ isFromMemoryCache: Bool) -> Void
 
     /// Loads an image and calls the given `handler`. The method itself 
     /// **doesn't do** anything when the image is loaded - you have full
@@ -90,7 +90,7 @@ public final class Manager: Loading {
     /// Loads an image with a given request by using manager's cache and loader.
     ///
     /// - parameter completion: Gets called asynchronously on the main thread.
-    public func loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<Image>) -> Void) {
+    public func loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<NukeImage>) -> Void) {
         queue.async {
             if token?.isCancelling == true { return } // Fast preflight check
             self._loadImage(with: request, token: token) { result in
@@ -99,7 +99,7 @@ public final class Manager: Loading {
         }
     }
 
-    private func _loadImage(with request: Request, token: CancellationToken? = nil, completion: @escaping (Result<Image>) -> Void) {
+    private func _loadImage(with request: Request, token: CancellationToken? = nil, completion: @escaping (Result<NukeImage>) -> Void) {
         // Check if image is in memory cache
         if let image = cachedImage(for: request) {
             completion(.success(image))
@@ -116,12 +116,12 @@ public final class Manager: Loading {
 
     // MARK: Memory Cache Helpers
 
-    private func cachedImage(for request: Request) -> Image? {
+    private func cachedImage(for request: Request) -> NukeImage? {
         guard request.memoryCacheOptions.readAllowed else { return nil }
         return cache?[request]
     }
 
-    private func store(image: Image, for request: Request) {
+    private func store(image: NukeImage, for request: Request) {
         guard request.memoryCacheOptions.writeAllowed else { return }
         cache?[request] = image
     }
@@ -174,7 +174,7 @@ public extension Manager {
 /// Represents an arbitrary target for image loading.
 public protocol Target: class {
     /// Callback that gets called when the request gets completed.
-    func handle(response: Result<Image>, isFromMemoryCache: Bool)
+    func handle(response: Result<NukeImage>, isFromMemoryCache: Bool)
 }
 
 #if os(macOS)
@@ -193,7 +193,7 @@ public protocol Target: class {
     extension ImageView: Target {
         /// Displays an image on success. Runs `opacity` transition if
         /// the response was not from the memory cache.
-        public func handle(response: Result<Image>, isFromMemoryCache: Bool) {
+        public func handle(response: Result<NukeImage>, isFromMemoryCache: Bool) {
             guard let image = response.value else { return }
             self.image = image
             if !isFromMemoryCache {

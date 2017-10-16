@@ -22,13 +22,13 @@ public final class Deduplicator: Loading {
 
     /// Combines requests with the same `loadKey` into a single request. The request
     /// only gets cancelled when all the underlying requests are cancelled.
-    public func loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<Image>) -> Void) {
+    public func loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<NukeImage>) -> Void) {
         queue.async {
             self._loadImage(with: request, token: token, completion: completion)
         }
     }
 
-    private func _loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<Image>) -> Void) {
+    private func _loadImage(with request: Request, token: CancellationToken?, completion: @escaping (Result<NukeImage>) -> Void) {
         let key = Request.loadKey(for: request)
         let task = tasks[key] ?? startTask(with: request, key: key)
 
@@ -51,7 +51,7 @@ public final class Deduplicator: Loading {
         return task
     }
 
-    private func complete(_ task: Task, key: AnyHashable, result: Result<Image>) {
+    private func complete(_ task: Task, key: AnyHashable, result: Result<NukeImage>) {
         guard tasks[key] === task else { return } // check if still registered
         task.handlers.forEach { $0(result) }
         tasks[key] = nil
@@ -68,7 +68,7 @@ public final class Deduplicator: Loading {
 
     private final class Task {
         let cts = CancellationTokenSource()
-        var handlers = [(Result<Image>) -> Void]()
+        var handlers = [(Result<NukeImage>) -> Void]()
         var retainCount = 0 // number of non-cancelled handlers
     }
 }

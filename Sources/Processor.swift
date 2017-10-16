@@ -7,7 +7,7 @@ import Foundation
 /// Performs image processing.
 public protocol Processing: Equatable {
     /// Returns processed image.
-    func process(_ image: Image) -> Image?
+    func process(_ image: NukeImage) -> NukeImage?
 }
 
 /// Composes multiple processors.
@@ -22,8 +22,8 @@ public struct ProcessorComposition: Processing {
     /// Processes the given image by applying each processor in an order in
     /// which they were added. If one of the processors fails to produce
     /// an image the processing stops and `nil` is returned.
-    public func process(_ input: Image) -> Image? {
-        return processors.reduce(input as Image!) { image, processor in
+    public func process(_ input: NukeImage) -> NukeImage? {
+        return processors.reduce(input as NukeImage!) { image, processor in
             return autoreleasepool { image != nil ? processor.process(image!) : nil }
         }
     }
@@ -36,7 +36,7 @@ public struct ProcessorComposition: Processing {
 
 /// Type-erased image processor.
 public struct AnyProcessor: Processing {
-    private let _process: (Image) -> Image?
+    private let _process: (NukeImage) -> NukeImage?
     private let _processor: Any
     private let _equals: (AnyProcessor) -> Bool
 
@@ -46,7 +46,7 @@ public struct AnyProcessor: Processing {
         self._equals = { ($0._processor as? P) == processor }
     }
 
-    public func process(_ image: Image) -> Image? {
+    public func process(_ image: NukeImage) -> NukeImage? {
         return self._process(image)
     }
 
@@ -93,7 +93,7 @@ public struct AnyProcessor: Processing {
         }
 
         /// Decompresses and scales the image.
-        public func process(_ image: Image) -> Image? {
+        public func process(_ image: NukeImage) -> NukeImage? {
             return decompress(image, targetSize: targetSize, contentMode: contentMode)
         }
 

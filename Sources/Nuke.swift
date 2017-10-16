@@ -7,11 +7,11 @@ import Foundation
 #if os(macOS)
     import AppKit.NSImage
     /// Alias for `NSImage`.
-    public typealias Image = NSImage
+    public typealias NukeImage = NSImage
 #else
     import UIKit.UIImage
     /// Alias for `UIImage`.
-    public typealias Image = UIImage
+    public typealias NukeImage = UIImage
 #endif
 
 /// Loads an image into the given target.
